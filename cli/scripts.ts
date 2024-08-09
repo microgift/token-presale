@@ -64,10 +64,8 @@ export const setClusterConfig = async (
  * Called by admin right after the program deployment
  * to initialize global state
  */
-export const initProject = async (
-    token: PublicKey
-) => {
-    const tx = await createInitializeTx(payer.publicKey, token, program);
+export const initProject = async () => {
+    const tx = await createInitializeTx(payer.publicKey, program);
 
     tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
 

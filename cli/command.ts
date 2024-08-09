@@ -1,7 +1,6 @@
 import { program } from "commander";
 import { PublicKey } from "@solana/web3.js";
 import {
-  depositPresaleToken,
   initProject,
   setClusterConfig,
   setStage,
@@ -12,9 +11,8 @@ import {
 program.version("0.0.1");
 
 programCommand("init")
-.option("-t, --token <string>", "token to use in the program")
 .action(async (directory, cmd) => {
-  const { env, keypair, rpc, token } = cmd.opts();
+  const { env, keypair, rpc } = cmd.opts();
 
   console.log("Solana Cluster:", env);
   console.log("Keypair Path:", keypair);
@@ -22,12 +20,7 @@ programCommand("init")
 
   await setClusterConfig(env, keypair, rpc);
   
-  if (token === undefined) {
-    console.log("Error token address");
-    return;
-  }
-
-  await initProject(new PublicKey(token));
+  await initProject();
 });
 
 programCommand("set-vault")
@@ -47,31 +40,6 @@ programCommand("set-vault")
   }
 
   await setVaultAddress(new PublicKey(vault));
-});
-
-programCommand("deposit-token")
-.option("-t, --token <string>", "token address that's used in the program")
-.option("-a, --amount <number>", "amount to be dposited")
-.action(async (directory, cmd) => {
-  const { env, keypair, rpc, token, amount } = cmd.opts();
-
-  console.log("Solana Cluster:", env);
-  console.log("Keypair Path:", keypair);
-  console.log("RPC URL:", rpc);
-
-  await setClusterConfig(env, keypair, rpc);
-  
-  if (token === undefined) {
-    console.log("Error vault address");
-    return;
-  }
-
-  if (amount === undefined || amount < 0) {
-    console.log("Error stable coin amount");
-    return;
-  }
-
-  await depositPresaleToken(new PublicKey(token), amount);
 });
 
 programCommand("start-presale")
@@ -132,10 +100,11 @@ program.parse(process.argv);
 
 /*
 
-yarn script init -t 5U6PVxcjCWo361vFwS6cfB65Br4T5jECA6vsVAtm5urt
+yarn script init
 yarn script set-vault -v DJDcV3UxP55KqHUKsTSBve7xssRYtbQ5eSG8uWND2HQ7
-yarn script deposit-token -t 5U6PVxcjCWo361vFwS6cfB65Br4T5jECA6vsVAtm5urt -a 200000000000000
 yarn script start-presale -t 5U6PVxcjCWo361vFwS6cfB65Br4T5jECA6vsVAtm5urt
 yarn script set-stage -s 1
+yarn script init-user
+yarn script buy -a 100000000 -v DJDcV3UxP55KqHUKsTSBve7xssRYtbQ5eSG8uWND2HQ7
 
 */

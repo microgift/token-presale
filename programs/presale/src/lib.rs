@@ -11,7 +11,7 @@ use instructions::*;
 use state::*;
 use util::*;
 
-declare_id!("6En2g3XUQgZSBEgBE1DF1sVeRik4KNvug151Zswz8oR5");
+declare_id!("FQD3fgJbtbvyeB9bMxSjauTW2HhkMdTVk1iTY1Y5EoQu");
 
 #[program]
 pub mod presale {

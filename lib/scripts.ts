@@ -13,7 +13,6 @@ import { Presale } from "../target/types/presale";
 
 export const createInitializeTx = async (
   admin: PublicKey,
-  token: PublicKey,
   program: Program<Presale>
 ) => {
   const [globalState, bump] = PublicKey.findProgramAddressSync(
@@ -21,10 +20,7 @@ export const createInitializeTx = async (
     program.programId
   );
   console.log("globalState: ", globalState.toBase58());
-
-  const tokenVault = getAssociatedTokenAccount(globalState, token);
-  console.log("tokenVault: ", tokenVault.toBase58());
-
+  
   const tx = new Transaction();
 
   tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
@@ -69,9 +65,7 @@ export const createSetVaultAddressTx = async (
         .setVaultAddress()
         .accounts({
           admin,
-          vault,
-          usdcVault,
-          usdtVault
+          vault
         })
         .transaction()
     );

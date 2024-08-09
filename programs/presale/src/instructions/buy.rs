@@ -67,10 +67,14 @@ impl Buy<'_> {
         // let asset_expo = asset_price.expo;
         // asset_price = asset_price.scale_to_exponent(asset_expo).unwrap();
 
-        msg!("SOL/USD price: {}", asset_price);
+        // msg!("SOL/USD price: {}", asset_price);
+        // msg!(": {}", asset_price as f64 / 100.0);
+        // msg!(": {}", asset_price as f64 / 100.0 / STAGES[stage_iterator as usize].price as f64);
+        // msg!(": {}", (sol_amount as f64 / LAMPORTS_PER_SOL as f64) as f64);
+        // msg!(": {}", asset_price as f64 / 100.0 / STAGES[stage_iterator as usize].price as f64 * (sol_amount as f64 / LAMPORTS_PER_SOL as f64));
 
         //  calculate token amount from sol_amount and token price
-        let mut token_amount = (asset_price as f64 / 100.0 / STAGES[stage_iterator as usize].price as f64 * (sol_amount / LAMPORTS_PER_SOL) as f64) as u64;
+        let mut token_amount = (asset_price as f64 / 100.0 / STAGES[stage_iterator as usize].price as f64 * (sol_amount as f64 / LAMPORTS_PER_SOL as f64)) as u64;
         msg!("token amount: {}", token_amount);
 
 

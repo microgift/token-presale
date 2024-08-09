@@ -37,5 +37,9 @@ pub const STAGES: [Stage; 10] = [
 pub const TOKEN_DECIMALS: u64 = 1_000_000;
 
 //  pyth price feed on solana mainnet-beta
-pub const SOL_USD_FEED: Pubkey = pubkey!("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG");
+// pub const SOL_USD_FEED: Pubkey = pubkey!("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG");
+
+//  pyth price feed on solana devnet
+pub const SOL_USD_FEED: Pubkey = pubkey!("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix");
+
 pub const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds

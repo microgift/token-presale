@@ -4,14 +4,14 @@
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-presale = "6En2g3XUQgZSBEgBE1DF1sVeRik4KNvug151Zswz8oR5"
+[programs.devnet]
+presale = "FQD3fgJbtbvyeB9bMxSjauTW2HhkMdTVk1iTY1Y5EoQu"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "admin.json"
 
 [scripts]
