@@ -28,6 +28,10 @@ pub struct BuyWithStableCoin<'info> {
     pub user_state: Account<'info, UserState>,
 
     
+    #[account(
+        mut,
+        constraint = global_state.vault == *vault.key @PresaleError::InvalidVault
+    )]
     /// CHECK: vault address(multi-sig wallet)
     pub vault: AccountInfo<'info>,
 

@@ -5,6 +5,9 @@ pub enum PresaleError {
     #[msg("Admin address dismatch")]
     InvalidAdmin,
 
+    #[msg("Vault address dismatch")]
+    InvalidVault,
+
     #[msg("Token address dismatch")]
     InvalidToken,
 

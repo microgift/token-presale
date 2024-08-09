@@ -33,9 +33,7 @@ export const createInitializeTx = async (
       await program.methods
         .initialize()
         .accounts({
-          admin,
-          token,
-          tokenVault
+          admin
         })
         .transaction()
     );
@@ -83,45 +81,6 @@ export const createSetVaultAddressTx = async (
   return tx;
 };
 
-export const createDepositPresaleToken = async (
-  admin: PublicKey,
-  token: PublicKey,
-  amount: number,
-  program: Program<Presale>
-) => {
-  const [globalState, bump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(GLOBAL_STATE_SEED)],
-    program.programId
-  );
-  console.log("globalState: ", globalState.toBase58());
-
-  const tokenAdmin = getAssociatedTokenAccount(admin, token);
-  console.log("tokenAdmin: ", tokenAdmin.toBase58());
-
-  const tokenVault = getAssociatedTokenAccount(globalState, token);
-  console.log("tokenVault: ", tokenVault.toBase58());
-
-  const tx = new Transaction();
-
-  tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
-    .add(ComputeBudgetProgram.setComputeUnitLimit({ units: 65_000 }))
-    .add(
-      await program.methods
-        .depositPresaleToken(new BN(amount))
-        .accounts({
-          admin,
-          token,
-          tokenAdmin,
-          tokenVault
-        })
-        .transaction()
-    );
-
-  tx.feePayer = admin;
-
-  return tx;
-};
-
 export const createStartPresaleTx = async (
   admin: PublicKey,
   token: PublicKey,
@@ -138,18 +97,16 @@ export const createStartPresaleTx = async (
 
   const tx = new Transaction();
 
-  tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
-    .add(ComputeBudgetProgram.setComputeUnitLimit({ units: 65_000 }))
-    .add(
-      await program.methods
-        .startPresale()
-        .accounts({
-          admin,
-          token,
-          tokenVault
-        })
-        .transaction()
-    );
+    tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
+      .add(ComputeBudgetProgram.setComputeUnitLimit({ units: 65_000 }))
+      .add(
+        await program.methods
+          .startPresale()
+          .accounts({
+            admin
+          })
+          .transaction()
+      );
 
   tx.feePayer = admin;
 

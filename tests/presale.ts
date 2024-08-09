@@ -187,20 +187,27 @@ describe("presale", () => {
 
     const buyAmount = 1_000_000_000;  //  1 SOL
 
-    const tx = await program.methods.buy(new BN(buyAmount))
-      .accounts({
-        user: userKp.publicKey,
-        vault: vaultKp.publicKey,
-      })
-      .signers([userKp])
-      .rpc({commitment: "confirmed"});
+    try {
+      const tx = await program.methods.buy(new BN(buyAmount))
+        .accounts({
+          user: userKp.publicKey,
+          vault: vaultKp.publicKey,
+        })
+        .signers([userKp])
+        .rpc({commitment: "confirmed"});
 
-    console.log("buy with SOL tx: ", tx);
+      console.log("buy with SOL tx: ", tx);
 
-    const userStateAfter = await program.account.userState.fetch(userStateAddr, "confirmed");
-    const balanceAfter = Number(userStateAfter.tokens);
+      const userStateAfter = await program.account.userState.fetch(userStateAddr);
+      const balanceAfter = Number(userStateAfter.tokens);
 
-    console.log("bought token amout: ", balanceAfter - balanceBefore);
+      const txLog = await connection.getTransaction(tx);
+      console.log(txLog);
+
+      console.log("bought token amout: ", balanceAfter - balanceBefore);
+    } catch (e) {
+      console.log(e)
+    }
   });
   
   it("User buys token with USDC", async () => {

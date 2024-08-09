@@ -27,7 +27,8 @@ pub struct Buy<'info> {
     pub user_state: Account<'info, UserState>,
     
     #[account(
-        mut
+        mut,
+        constraint = global_state.vault == *vault.key @PresaleError::InvalidVault
     )]
     /// CHECK: vault address(multi-sig wallet)
     pub vault: AccountInfo<'info>,
@@ -60,8 +61,7 @@ impl Buy<'_> {
         // Retrieve Pyth price
         let price_account_info = &ctx.accounts.price_feed;
         let price_feed: pyth_sdk_solana::PriceFeed = SolanaPriceAccount::account_info_to_feed(price_account_info).unwrap();
-        let timestamp = Clock::get()?.unix_timestamp;
-        let asset_price = price_feed.get_price_no_older_than(timestamp, 60).unwrap().price;
+        let asset_price = price_feed.get_price_unchecked().price;
         
         // Scale price to expected decimals
         // let asset_expo = asset_price.expo;

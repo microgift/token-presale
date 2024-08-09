@@ -11,7 +11,7 @@ import {
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 
 import { Presale } from "../target/types/presale";
-import { createDepositPresaleToken, createInitializeTx, createSetStageTx, createSetVaultAddressTx, createStartPresaleTx } from '../lib/scripts';
+import { createInitializeTx, createSetStageTx, createSetVaultAddressTx, createStartPresaleTx } from '../lib/scripts';
 import { execTx } from "../lib/util";
 
 let solConnection: Connection = null;
@@ -78,17 +78,6 @@ export const setVaultAddress = async (
     vault: PublicKey
 ) => {
     const tx = await createSetVaultAddressTx(payer.publicKey, vault, program);
-
-    tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
-
-    await execTx(tx, solConnection, payer);
-}
-
-export const depositPresaleToken = async (
-    token: PublicKey,
-    amount: number
-) => {
-    const tx = await createDepositPresaleToken(payer.publicKey, token, amount, program);
 
     tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
 
