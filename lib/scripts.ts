@@ -130,3 +130,80 @@ export const createSetStageTx = async (
 
   return tx;
 };
+
+export const createInitUserTx = async (
+  user: PublicKey,
+  program: Program<Presale>
+) => {
+
+  const tx = new Transaction();
+
+  tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
+    .add(ComputeBudgetProgram.setComputeUnitLimit({ units: 65_000 }))
+    .add(
+      await program.methods
+        .initUser()
+        .accounts({
+          user
+        })
+        .transaction()
+    );
+
+  tx.feePayer = user;
+
+  return tx;
+};
+
+export const createBuyTx = async (
+  user: PublicKey,
+  solAmount: number,
+  vault: PublicKey,
+  program: Program<Presale>
+) => {
+
+  const tx = new Transaction();
+
+  tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
+    .add(ComputeBudgetProgram.setComputeUnitLimit({ units: 65_000 }))
+    .add(
+      await program.methods
+        .buy(new BN(solAmount))
+        .accounts({
+          user,
+          vault
+        })
+        .transaction()
+    );
+
+  tx.feePayer = user;
+
+  return tx;
+};
+
+export const createBuyWithStableCoinTx = async (
+  user: PublicKey,
+  coinAmount: number,
+  vault: PublicKey,
+  program: Program<Presale>
+) => {
+  const stableCoin = USDC_ADDRESS;
+
+  const tx = new Transaction();
+
+  tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1_000_000 }))
+    .add(ComputeBudgetProgram.setComputeUnitLimit({ units: 65_000 }))
+    .add(
+      await program.methods
+        .buyWithStableCoin(new BN(coinAmount))
+        .accounts({
+          user,
+          vault,
+          stableCoin
+        })
+        .transaction()
+    );
+
+  tx.feePayer = user;
+
+  return tx;
+};

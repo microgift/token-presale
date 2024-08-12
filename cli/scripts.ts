@@ -11,7 +11,7 @@ import {
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 
 import { Presale } from "../target/types/presale";
-import { createInitializeTx, createSetStageTx, createSetVaultAddressTx, createStartPresaleTx } from '../lib/scripts';
+import { createBuyTx, createBuyWithStableCoinTx, createInitializeTx, createInitUserTx, createSetStageTx, createSetVaultAddressTx, createStartPresaleTx } from '../lib/scripts';
 import { execTx } from "../lib/util";
 
 let solConnection: Connection = null;
@@ -96,6 +96,37 @@ export const setStage = async (
     stageNum: number
 ) => {
     const tx = await createSetStageTx(payer.publicKey, stageNum, program);
+
+    tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
+
+    await execTx(tx, solConnection, payer);
+}
+
+export const initUser = async (
+) => {
+    const tx = await createInitUserTx(payer.publicKey, program);
+
+    tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
+
+    await execTx(tx, solConnection, payer);
+}
+
+export const buy = async (
+    solAmount: number,
+    vault: PublicKey
+) => {
+    const tx = await createBuyTx(payer.publicKey, solAmount, vault, program);
+
+    tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
+
+    await execTx(tx, solConnection, payer);
+}
+
+export const buyWithStableCoin = async (
+    coinAmount: number,
+    vault: PublicKey
+) => {
+    const tx = await createBuyWithStableCoinTx(payer.publicKey, coinAmount, vault, program);
 
     tx.recentBlockhash = (await solConnection.getLatestBlockhash()).blockhash;
 

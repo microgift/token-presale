@@ -1,12 +1,16 @@
 import { program } from "commander";
 import { PublicKey } from "@solana/web3.js";
 import {
+  buy,
+  buyWithStableCoin,
   initProject,
+  initUser,
   setClusterConfig,
   setStage,
   setVaultAddress,
   startPresale,
 } from "./scripts";
+import { createInitUserTx } from "../lib/scripts";
 
 program.version("0.0.1");
 
@@ -75,6 +79,49 @@ programCommand("set-stage")
   await setStage(stage);
 });
 
+programCommand("init-user")
+.action(async (directory, cmd) => {
+  const { env, keypair, rpc } = cmd.opts();
+
+  console.log("Solana Cluster:", env);
+  console.log("Keypair Path:", keypair);
+  console.log("RPC URL:", rpc);
+
+  await setClusterConfig(env, keypair, rpc);
+  
+  await initUser();
+});
+
+programCommand("buy")
+.option("-a, --amount <number>", "amount")
+.option("-v, --vault <number>", "vault")
+.action(async (directory, cmd) => {
+  const { env, keypair, rpc, amount, vault } = cmd.opts();
+
+  console.log("Solana Cluster:", env);
+  console.log("Keypair Path:", keypair);
+  console.log("RPC URL:", rpc);
+
+  await setClusterConfig(env, keypair, rpc);
+  
+  await buy(amount, new PublicKey(vault));
+});
+
+programCommand("buy-usd")
+.option("-a, --amount <number>", "amount")
+.option("-v, --vault <number>", "vault")
+.action(async (directory, cmd) => {
+  const { env, keypair, rpc, amount, vault } = cmd.opts();
+
+  console.log("Solana Cluster:", env);
+  console.log("Keypair Path:", keypair);
+  console.log("RPC URL:", rpc);
+
+  await setClusterConfig(env, keypair, rpc);
+  
+  await buyWithStableCoin(amount, new PublicKey(vault));
+});
+
 function programCommand(name: string) {
   return program
     .command(name)
@@ -101,10 +148,10 @@ program.parse(process.argv);
 /*
 
 yarn script init
-yarn script set-vault -v DJDcV3UxP55KqHUKsTSBve7xssRYtbQ5eSG8uWND2HQ7
+yarn script set-vault -v 5QevqShzBWSXt3JWgEWFnLGrm8HWYQNkFiHsK3NRybhA
 yarn script start-presale -t 5U6PVxcjCWo361vFwS6cfB65Br4T5jECA6vsVAtm5urt
 yarn script set-stage -s 1
 yarn script init-user
-yarn script buy -a 100000000 -v DJDcV3UxP55KqHUKsTSBve7xssRYtbQ5eSG8uWND2HQ7
+yarn script buy -a 100000000 -v 5QevqShzBWSXt3JWgEWFnLGrm8HWYQNkFiHsK3NRybhA
 
 */
