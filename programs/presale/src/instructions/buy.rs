@@ -105,6 +105,7 @@ impl Buy<'_> {
 
         //  add total USD received
         global_state.token_sold_usd += STAGES[stage_iterator as usize].price * token_amount;
+        msg!(": {}", STAGES[stage_iterator as usize].price * token_amount);
 
         //  add user info
         let user_state = &mut ctx.accounts.user_state;

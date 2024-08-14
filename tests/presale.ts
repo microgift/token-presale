@@ -16,9 +16,11 @@ describe("presale", () => {
 
   const adminKp = Keypair.generate();
   const userKp = Keypair.generate();
+  const user2Kp = Keypair.generate();
 
   console.log("admin: ", adminKp.publicKey.toBase58());
   console.log("user: ", userKp.publicKey.toBase58());
+  console.log("user2: ", user2Kp.publicKey.toBase58());
 
   before(async () => {
     console.log("airdrop SOL to admin")
@@ -34,13 +36,20 @@ describe("presale", () => {
       5 * LAMPORTS_PER_SOL
     );
     await connection.confirmTransaction(airdropTx2);
-
-    console.log("airdrop SOL to vault")
+    
+    console.log("airdrop SOL to user2")
     const airdropTx3 = await connection.requestAirdrop(
-      vaultKp.publicKey,
+      user2Kp.publicKey,
       5 * LAMPORTS_PER_SOL
     );
     await connection.confirmTransaction(airdropTx3);
+
+    console.log("airdrop SOL to vault")
+    const airdropTx4 = await connection.requestAirdrop(
+      vaultKp.publicKey,
+      5 * LAMPORTS_PER_SOL
+    );
+    await connection.confirmTransaction(airdropTx4);
 
     console.log("create USDC/USDT");
     await createMints(adminKp);
@@ -71,18 +80,12 @@ describe("presale", () => {
   });
 
   it("Set vault address", async () => {
-    const usdcVault = getAssociatedTokenAccount(vaultKp.publicKey, usdcKp.publicKey);
-    const usdtVault = getAssociatedTokenAccount(vaultKp.publicKey, usdtKp.publicKey);
     console.log("vault: ", vaultKp.publicKey.toBase58());
-    console.log("usdcVault: ", usdcVault.toBase58());
-    console.log("usdtVault: ", usdtVault.toBase58());
 
     const tx = await program.methods.setVaultAddress()
       .accounts({
         admin: adminKp.publicKey,
-        vault: vaultKp.publicKey,
-        usdcVault,
-        usdtVault
+        vault: vaultKp.publicKey
       })
       .signers([adminKp])
       .rpc();
@@ -219,12 +222,8 @@ describe("presale", () => {
       [userKp.publicKey.toBuffer(), Buffer.from(USER_SEED)],
       program.programId
     );
-    const stableCoinUser = getAssociatedTokenAccount(userKp.publicKey, usdcKp.publicKey);
-    const stableCoinVault = getAssociatedTokenAccount(vaultKp.publicKey, usdcKp.publicKey);
     
     console.log("globalStateAddr: ", globalStateAddr.toBase58());
-    console.log("stableCoinUser: ", stableCoinUser.toBase58());
-    console.log("stableCoinVault: ", stableCoinVault.toBase58());
 
     const userState = await program.account.userState.fetch(userStateAddr, "confirmed");
     const balanceBefore = Number(userState.tokens);
@@ -235,9 +234,7 @@ describe("presale", () => {
       .accounts({
         user: userKp.publicKey,
         vault: vaultKp.publicKey,
-        stableCoin: usdcKp.publicKey,
-        stableCoinUser,
-        stableCoinVault
+        stableCoin: usdcKp.publicKey
       })
       .signers([userKp])
       .rpc({commitment: "confirmed"});
@@ -245,6 +242,63 @@ describe("presale", () => {
     console.log("buy with USDC tx: ", tx);
 
     const userStateAfter = await program.account.userState.fetch(userStateAddr, "confirmed");
+    const balanceAfter = Number(userStateAfter.tokens);
+
+    console.log("bought token amout: ", balanceAfter - balanceBefore);
+  });
+
+  it("Initialize another user state", async () => {
+    const [userStateAddr, _userIx] = PublicKey.findProgramAddressSync(
+      [user2Kp.publicKey.toBuffer(), Buffer.from(USER_SEED)],
+      program.programId
+    );
+    
+    console.log("userStateAddr: ", userStateAddr.toBase58());
+
+    const tx = await program.methods.initUser()
+      .accounts({
+        user: user2Kp.publicKey,
+        
+      })
+      .signers([user2Kp])
+      .rpc();
+
+    console.log("init user tx: ", tx);
+
+    const userState = await program.account.userState.fetch(userStateAddr);
+    expect(userState).to.not.be.null;
+  });
+
+  it("User buys token with USDC to", async () => {
+    const [globalStateAddr, _] = PublicKey.findProgramAddressSync(
+      [Buffer.from(GLOBAL_SEED)],
+      program.programId
+    );
+    const [user2StateAddr, _userIx] = PublicKey.findProgramAddressSync(
+      [user2Kp.publicKey.toBuffer(), Buffer.from(USER_SEED)],
+      program.programId
+    );
+    
+    console.log("globalStateAddr: ", globalStateAddr.toBase58());
+
+    const userState = await program.account.userState.fetch(user2StateAddr, "confirmed");
+    const balanceBefore = Number(userState.tokens);
+
+    const buyAmount = 1_000_000_000;  //  1000 USDC
+
+    const tx = await program.methods.buyWithStableCoinTo(new BN(buyAmount))
+      .accounts({
+        user: userKp.publicKey,
+        to: user2Kp.publicKey,
+        vault: vaultKp.publicKey,
+        stableCoin: usdcKp.publicKey
+      })
+      .signers([userKp])
+      .rpc({commitment: "confirmed"});
+
+    console.log("buy with USDC tx: ", tx);
+
+    const userStateAfter = await program.account.userState.fetch(user2StateAddr, "confirmed");
     const balanceAfter = Number(userStateAfter.tokens);
 
     console.log("bought token amout: ", balanceAfter - balanceBefore);

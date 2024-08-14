@@ -16,3 +16,5 @@ pub mod buy;
 pub use buy::*;
 pub mod buy_with_stable_coin;
 pub use buy_with_stable_coin::*;
+pub mod buy_with_stable_coin_to;
+pub use buy_with_stable_coin_to::*;

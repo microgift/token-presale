@@ -83,5 +83,13 @@ pub mod presale {
     ) -> Result<()> {
         BuyWithStableCoin::process_instruction(ctx, stable_token_amount)
     }
+
+    //  Buy with USDC/USDT to other user
+    pub fn buy_with_stable_coin_to(
+        ctx: Context<BuyWithStableCoinTo>, 
+        stable_token_amount: u64
+    ) -> Result<()> {
+        BuyWithStableCoinTo::process_instruction(ctx, stable_token_amount)
+    }
 }
 
